@@ -1,0 +1,45 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 03</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .div-to-show {
+            width: 200px;
+            height: 200px;
+            background-color: black;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .div-to-show:hover {
+            background-color: blue;
+        }
+    </style>
+
+    <script>
+        function handleClick() {
+            const divToShow = document.getElementsByClassName('div-to-show')[0];
+
+            divToShow.style.display = divToShow.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <button onclick={handleClick()}>Turn it on!</button>
+        <div class="div-to-show"></div>
+    </div>
+</body>
+
+</html>
