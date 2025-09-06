@@ -3,13 +3,19 @@
 
 <head>
   <title>Week 02 tutorial</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
-  <div>
-    <span><img src="./images/icelandic-horses-picjumbo-com.jpg" alt="" height="100px" width="100px  "></span>
-    <span>This is the description of the image</span>
+  <div class="flex flex-row items-center justify-center gap-4 ">
+    <!-- <span><img src="./images/icelandic-horses-picjumbo-com.jpg" alt="" height="100px" width="100px"></span> -->
+    <!-- <span><img src="./images/icelandic-horses-picjumbo-com.jpg" alt="" className="h-100px w-100px"></span> -->
+
+    <div class="h-[700px] w-[700px] overflow-hidden border border-gray-300">
+      <img class="h-full w-full object-cover" src="./images/icelandic-horses-picjumbo-com.jpg" alt="Image">
+    </div>
+
+    <div class="text-lg">This is the description of the image</div>
   </div>
 </body>
-
 </html>
