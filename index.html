@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 2 Assignment: Learning Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .dark {
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .fact {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Container of the page -->
+    <div class="container">
+        <h1>JQuery Learning Page</h1> 
+        <button id="toggleInfo">Info</button>
+        <button id="darkMode">Toggle Dark Mode</button>
+
+        <!-- Info section which shows or hides after clicking 'Info' button -->
+        <div id="infoSection" class="hidden">
+            <h2>About jQuery</h2>
+            <p>jQuery is a fast, small, and feature-rich JavaScript library. It makes HTML document traversal, event
+                handling, and animation much simpler.</p>
+            <ul>
+                <li>✔ Simplifies JavaScript code</li>
+                <li>✔ Easy DOM manipulation</li>
+                <li>✔ Works across all browsers</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- Search bar to search for the probable facts word by word -->
+        <h2>🔍 Search Facts</h2>
+        <input type="text" id="search" placeholder="Type to filter facts..." />
+
+        <div id="facts">
+            <div class="fact">jQuery was released in 2006.</div>
+            <div class="fact">It uses the “$” sign as a shortcut.</div>
+            <div class="fact">You can use jQuery for animations and AJAX calls.</div>
+            <div class="fact">Many big sites still use jQuery for simple UI tasks.</div>
+            <div class="fact">jQuery makes DOM traversal easier than plain JavaScript.</div>
+        </div>
+
+        <hr>
+
+        <!-- Button to animate the facts -->
+        <button id="animateFacts">Animate Facts</button>
+    </div>
+
+    <script>
+        // Hide or show Info Section
+        $("#toggleInfo").click(function () {
+            $("#infoSection").slideToggle();
+        });
+
+        // Dark Mode On and Off
+        $("#darkMode").click(function () {
+            $("body").toggleClass("dark");
+        });
+
+        // Live Search Filter
+        $("#search").on("keyup", function () {
+            let searchText = $(this).val().toLowerCase();
+            $("#facts .fact").each(function () {
+                let factText = $(this).text().toLowerCase();
+                if (factText.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+
+        // Animate Facts
+        $("#animateFacts").click(function () {
+            $("#facts .fact").each(function (i) {
+                $(this).delay(200 * i).fadeToggle(400).fadeToggle(400);
+            });
+        });
+    </script>
+</body>
+
+</html>
