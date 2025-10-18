@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Simple Firebase To-Do</title>
+
+    <!-- Small CSS for mobile-first layout (keeps it simple) -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 12px 0;
+            font-size: 20px;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #1976d2;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .del {
+            color: #d32f2f;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 12px 0;
+        }
+
+        /* small screens */
+        @media (max-width:420px) {
+            h1 {
+                font-size: 18px;
+            }
+
+            button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1> Simple Firebase To-Do</h1>
+
+        <!-- Input row -->
+        <div class="row">
+            <input id="taskInput" type="text" placeholder="Add a new task..." />
+            <button id="addBtn">Add</button>
+        </div>
+
+        <!-- Where tasks will be shown -->
+        <ul id="taskList"></ul>
+    </div>
+
+    <!-- Single module script: initializes Firebase and contains all app logic -->
+    <script type="module">
+
+        // IMPORT the functions we need from the Firebase CDN -----
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import {
+            getDatabase,
+            ref,
+            push,
+            onValue,
+            remove
+        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+        // FIREBASE CONFIG (from Firebase Console → Project Settings) 
+        const firebaseConfig = {
+            apiKey: "AIzaSyALBxqs8v2vsisWvqVugeaHp2OXgx532v8",
+            authDomain: "test-71e86.firebaseapp.com",
+            databaseURL: "https://test-71e86-default-rtdb.firebaseio.com",
+            projectId: "test-71e86",
+            storageBucket: "test-71e86.firebasestorage.app",
+            messagingSenderId: "437015064505",
+            appId: "1:437015064505:web:bc04514ac462b0cb339068"
+        };
+
+        // INITIALIZE Firebase and Database 
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);                 // db is our connection to Realtime Database
+        const tasksRef = ref(db, "tasks/");          // points to the 'tasks' node in the DB
+
+        // UI ELEMENTS -----
+        const input = document.getElementById("taskInput");
+        const addBtn = document.getElementById("addBtn");
+        const list = document.getElementById("taskList");
+
+        // Helper: render a single task item in the list 
+        function renderTask(id, text) {
+            const li = document.createElement("li");
+
+            // Left: task text
+            const span = document.createElement("span");
+            span.textContent = text;
+
+            // Right: delete control
+            const del = document.createElement("span");
+            del.textContent = "🗑️";
+            del.className = "del";
+            del.title = "Delete task";
+            del.onclick = () => remove(ref(db, `tasks/${id}`)); // remove node from Firebase
+
+            li.appendChild(span);
+            li.appendChild(del);
+            list.appendChild(li);
+        }
+
+        // Load & render tasks in real-time 
+        // onValue sets up a listener that runs every time the 'tasks/' node changes.
+        onValue(tasksRef, (snapshot) => {
+            list.innerHTML = "";                 // clear existing list in DOM
+            const data = snapshot.val();         // get the JS object stored at 'tasks/'
+
+            if (!data) {
+                // If there are no tasks, show a small hint
+                const empty = document.createElement("div");
+                empty.className = "empty";
+                empty.textContent = "No tasks yet — add one!";
+                list.appendChild(empty);
+                return;
+            }
+
+            // data is an object of { id1: {text:...}, id2: {text:...}, ... }
+            Object.keys(data).forEach((id) => {
+                renderTask(id, data[id].text);
+            });
+        }, (error) => {
+            // Optional: handle permission/network errors here
+            console.error("Firebase read failed:", error);
+            list.innerHTML = "<div class='empty'>Could not load tasks (check console).</div>";
+        });
+
+        // Add new task when user clicks the button 
+        addBtn.addEventListener("click", () => {
+            const text = input.value.trim();
+            if (!text) return;                   // ignore empty input
+
+            // push() creates a new child with a unique key under 'tasks/'
+            push(tasksRef, { text })
+                .then(() => { input.value = ""; }) // clear input on success
+                .catch((err) => {                  // handle write errors
+                    console.error("Failed to add task:", err);
+                    alert("Could not add task. Check console.");
+                });
+        });
+
+        // Optional: allow pressing Enter key to add task
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") addBtn.click();
+        });
+
+        // the onValue listener will refresh the UI automatically.
+    </script>
+</body>
+
+</html>
